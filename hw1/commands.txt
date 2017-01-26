@@ -1,0 +1,11 @@
+mydata = read.table("/Users/biona001/Benjamin_Folder/UCLA/biomath_204/hw1/States.txt")
+
+> satVerbal = mydata[[3]]
+> satMath = mydata[[4]]
+> population = mydata[[2]]
+> pay = mydata[[7]]
+
+
+plot(satVerbal, noHS, main="Student performance vs % of people without high school", xlab="sat Verbal score", ylab="Percent no High School", pch=19)
+> regl <- lm(pay ~ satMath)
+> abline(regl)

@@ -85,15 +85,16 @@ Given $b_0, b_1$ are least-square estimators for the above regression model, sho
 \end{problem}
 
 \begin{proof}
-Intuitively, if we have a line that we know best estimates a set of data, then that line should be placed so that the sum of squared error is minimized. To minimize error, we must have this line pass through the mean of the data, because otherwise there would be as associated bias away from the mean. If there is bias then this line cannot be the best estimate of the data.\\ 
+Intuitively, if we have a line that we know best estimates a set of data, then that line should be placed so that the sum of squared error is minimized. As in any refression, $X_i$ are the inputs (observed) and $Y_i$ are the outputs (predicted). Here we are asked to prove that if $\bar{X}$ was the input, then $\bar{Y}$ must be the output. \\ 
 \\
 The formal proof has already been given in lecture, though. Let
 $$Q = \sum_i \epsilon_i^2 = \sum_i [Y_i - b_0 - b_1X_i]^2$$
 $$\frac{\partial Q}{\partial b_0} = -2\sum_i [Y_i - b_0 - b_1X_i]$$
 Setting the above expression equal to zero (i.e. finding the minimum or maximum), we have 
 $$\sum_i Y_i - nb_0 - b_1\sum_i X_i = 0 \iff \bar{Y} - b_0 - b_1 \bar{X} = 0$$
-$$\Rightarrow \bar{Y} = b_0 + b_1\bar{X}$$
-Thus the point $(\bar{X}, \bar{Y})$ is on the regression line defined by $b_0$ and $b_1$. Because $\frac{\partial^2 Q}{\partial b_0^2} = 2,$ the function is concave upwards, so this point is indeed a minimum. 
+$$\Rightarrow \bar{Y}= b_0 - b_1\bar{X}$$
+
+Thus the point $(\bar{X}, \bar{Y})$ is on the regression line defined by $b_0$ and $b_1$ (i.e. input $\bar{X}$ spits out $\bar{Y}$). Because $\frac{\partial^2 Q}{\partial b_0^2} = 2,$ the function is concave upwards, so this point is indeed a minimum. 
 \end{proof}
 
 \begin{problem}{4}

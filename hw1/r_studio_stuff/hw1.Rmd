@@ -88,28 +88,45 @@ satMath = mydata[[4]]
 population = mydata[[2]]
 pay = mydata[[7]]
 
-plot(satMath, satVerbal, main="Math Score vs English score", xlab="sat Math score", ylab="sat Verbal score", pch=19)
+plot(satMath, satVerbal, main="Math Score vs English score", 
+     xlab="sat Math score", ylab="sat Verbal score", pch=19)
 math_verbal_cor = cor(satMath, satVerbal)
 regression_line_1 = lm(satVerbal ~ satMath)
 abline(regression_line_1)
 
-plot(satMath, pay, main="Student performance vs Teacher's Pay", xlab="sat Math score", ylab="Teacher's salary in thousands", pch=19)
+plot(satMath, pay, main="Student performance vs Teacher's Pay", 
+     xlab="sat Math score", ylab="Teacher's salary in thousands", pch=19)
 regression_line_2 = lm(pay ~ satMath)
 abline(regression_line_2)
 
-plot(satVerbal, noHS, main="Student performance vs % of people without high school", xlab="sat Verbal score", ylab="Percent no High School", pch=19)
+plot(satVerbal, noHS, main="Student performance vs % of people without high school", 
+     xlab="sat Verbal score", ylab="Percent no High School", pch=19)
 ```
 
 
-For the States.txt dataset, I compared the following: "sat Math vs english score,"" teachers pay vs student performance (math SAT)" and "percent of state population without high school education vs student performance (verbal SAT)." I really should have used a histogram to illustrate these graphs, but according to the textbook I should divide the 50 states into $2\sqrt{50} \approx 14$ bins so that the graph doesn't appear too overwhelming. However I'm new to R and had a hard time figuring out how to do that since the data were given in terms of the 50 separate states, so I just plotted everything with scatter plot in the hope that it's more illustrative than 50 bars (see next page).
+For the States.txt dataset, I compared the following: "sat Math vs english score,"" teachers pay vs student performance (math SAT)" and "percent of state population without high s chool education vs student performance (verbal SAT)." I really should have used a histogram to illustrate these graphs, but according to the textbook I should divide the 50 states into $2\sqrt{50} \approx 14$ bins so that the graph doesn't appear too overwhelming. However I'm new to R and had a hard time figuring out how to do that since the data were given in terms of the 50 separate states, so I just plotted everything with scatter plot in the hope that it's more illustrative than 50 bars.
 
 First I wanted to determine how well a student's math ability can be used to predict his verbal ability. As seen in the first graph, the correlation is extremely good (0.9702879), so states that do well in one area tends to do well in the other.
 
-Then I compared teacher's salary with student's SAT math scores. Intuitively we expect higher salary to reflect a higher qualification, but apparently the higher teacher's average salary, the worse students perform on their exams (cor = -0.4039747). 
+Then I compared teacher's salary with student's SAT math scores. Intuitively we expect higher salary to reflect a higher qualification, so students receive a better education and thus scores better. However according to this dataset, the higher teacher's average salary, the worse students perform on their exams (cor = -0.4039747). 
 
 Finally, the bottom graph shows that while a state's population without high school education could vary considerably (from 13 to 35), that does not have any effect on student's verbal SAT score (cor = -0.04700939). This is another rather strange phenomenon since we would expect a more educated state to treat SAT more seriously and hence be more successful at it. 
 
-If we ignore the part that some states have as much as 35 percent of the population without a high school diploma, there is little unusal values. 
+The state scoring 510 on sat Math but 480 on sat Verbal is the point deviating the most away from the regression line in plot 1. Even so, 30 points is not a huge discrepency. If we ignore the part that some states have as much as 35 percent of the population without a high school diploma, there is little unusal values. 
 
 #problem 5
+Perform a least-squares regression of fertility on contraception from Robery et al.'s data in developing countries. Plot the data and the least-squares line. Does the line adequately summarize the relationship between these variables? Examine and interpret the values of $A, B, S_E,$, and $r$ or $r^2$. 
 
+```{r}
+mydata = read.table("C:/Users/biona002/Desktop/biomath_204-master/r_studio_stuff/robey.txt")
+total_fertility_rate = mydata[[2]]
+contraception = mydata[[3]]
+
+plot(contraception, total_fertility_rate, main="Total fertility rate vs Contraception", 
+     xlab="Percept of contraceptors", ylab="Avg number of children", pch=19)
+
+line_1 = lm(total_fertility_rate ~ contraception)
+abline(line_1)
+```
+
+Here the X axis describes the percentage of women in childbearing age who use contraceptions, and the Y axis describes the average number of childrens a women gives birth to. Clearly, the higher number of children the lower the contraception usage, with correlation between the two variable being -0.9203109. 

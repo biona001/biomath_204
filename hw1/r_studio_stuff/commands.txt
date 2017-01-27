@@ -1,0 +1,14 @@
+mydata = read.table("C:/Users/biona002/Desktop/biomath_204-master/r_studio_stuff/States.txt")
+noHS = mydata[[6]]
+satVerbal = mydata[[3]]
+satMath = mydata[[4]]
+population = mydata[[2]]
+pay = mydata[[7]]
+
+plot(satMath, satVerbal, main="Math Score vs English score", xlab="sat Math score", ylab="sat Verbal score", pch=19)
+plot(satVerbal, noHS, main="Student performance vs % of people without high school", xlab="sat Verbal score", ylab="Percent no High School", pch=19)
+plot(satMath, pay, main="Student performance vs Teacher's Pay", xlab="sat Math score", ylab="Teacher's salary in thousands", pch=19)
+
+
+lm(pay ~ satMath)
+abline(regl)

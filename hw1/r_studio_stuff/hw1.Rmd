@@ -66,7 +66,7 @@ Therefore $V(b_0) \leq V(\widetilde{b_0})$ and we have proven the gauss-markov t
 #problem 2
 Given $b_0, b_1$ are least-square estimators for the above regression model, show that the point $(\bar{X}, \bar{Y})$ always falls on the line $Y_i = b_0 + b_1X_i.$
 
-Intuitively, if we have a line that we know best estimates a set of data, then that line should be placed so that the sum of squared error is minimized. As in any refression, $X_i$ are the inputs (observed) and $Y_i$ are the outputs (predicted). Here we are asked to prove that if $\bar{X}$ was the input, then $\bar{Y}$ must be the output. 
+Here we are asked to prove that if $\bar{X}$ was the input, then $\bar{Y}$ must be the output. Intuitively, if we have a line that we know best estimates a set of data, then that line should be placed so that the sum of squared error is minimized. If error is minimized, then the line roughly goes the the center of all data's, i.e. it passes through the mean.
 
 The formal proof has already been given in lecture, though. Let
 $$Q = \sum_i \epsilon_i^2 = \sum_i [Y_i - b_0 - b_1X_i]^2$$
@@ -76,6 +76,50 @@ $$\sum_i Y_i - nb_0 - b_1\sum_i X_i = 0 \iff \bar{Y} - b_0 - b_1 \bar{X} = 0$$
 $$\Rightarrow \bar{Y}= b_0 - b_1\bar{X}$$
 
 Thus the point $(\bar{X}, \bar{Y})$ is on the regression line defined by $b_0$ and $b_1$ (i.e. input $\bar{X}$ spits out $\bar{Y}$). Because $\frac{\partial^2 Q}{\partial b_0^2} = 2,$ the function is concave upwards, so this point is indeed a minimum. 
+
+
+#problem 3
+Given the regression model $Y_i = \beta_0 + \beta_1X_i + \epsilon_i$ show that the mean square error 
+$$MSE = \frac{\sum (Y_i - \hat{Y_i})^2}{n - 2}$$ 
+is an unbiased estimator.
+
+Couldn't say I made good progress, but here's my two cents.
+
+From lecture, we received hints on doing this with the hat matrix, implying that we should work in vector form. So set our model as 
+$$Y = Xb + \epsilon, \quad b = (X'X)^{-1}X'Y$$
+$$\epsilon = Y - Xb = Y - X(X'X)^{-1}X'Y.$$
+
+Here $Y$ is a $n\times1$ vector, $X$ is $n \times 2$, $b$ is $2\times1$, and $\epsilon$ is $n \times 1$. From this we must show that 
+$$E(\sum (Y_i - \hat{Y_i})^2) = E(\epsilon'\epsilon) = (n-2)\sigma^2.$$
+Now, apply the well-known formula $V(x) = E(x^2) - E(x)^2$:
+
+$$E(\epsilon'\epsilon) = V(\epsilon) + E(\epsilon)^2$$
+
+We know that $V(\epsilon) = \sigma^2$ from assumption. To evaluate $E(\epsilon)^2 = E(\epsilon')E(\epsilon)$, substitute the definition above:
+\begin{equation}
+\begin{split}
+E(\epsilon')E(\epsilon) 
+&= E(Y-Xb)E[(Y-Xb)']\\
+&= E(Y - X(X'X)^{-1}X'Y)E[(Y - X(X'X)^{-1}X'Y)']
+\end{split}
+\end{equation}
+
+and then I got stuck.
+
+\textbf{attemp 2:} evaluate $E(\epsilon'\epsilon)$ in terms of $Y$'s:
+
+\begin{equation}
+\begin{split}
+E(\epsilon'\epsilon)
+&= E[(Y-\hat{Y})'(Y-\hat{Y})]\\
+&= E[Y'Y] - 2E[Y'\hat{Y}] + E[\hat{Y}'\hat{Y}]\\
+\end{split}
+\end{equation}
+Now recall we were also told to take advantage of the hat matrix $H = X(X'X)^{-1}X'$. We have $\hat{Y} = HY$, so we can rewrite the above equation to 
+$$E[Y'Y] - 2E[Y'HY] + E[Y'H'HY] = E[Y'Y] - 2E[Y'HY] + E[Y'HY] = E[Y'Y] - E[Y'HY] $$
+where the first equality is true because H is symmetric and idempotent. 
+
+If we now use the formula $V(X) = E(X^2) + E(X)^2$, we would run into the same trouble as in attempt 1. On the other hand, if I subsitute the model's definition for Y, $Y = Xb + \epsilon$ and $b = (X'X)^{-1}X'Y,$ I wouldn't get much further. We were also told use trace somewhere, but I never figured out how. This is as far as I got.
 
 # problem 4
 Using methods described in section 3.1, examine the quantitative variables of "States.txt". Characterize the distribution of the variables in terms of symmetry or skewness; non-normality or apparently normality, number of modes, and presence/absence of unusual values. 
@@ -108,11 +152,11 @@ For the States.txt dataset, I compared the following: "sat Math vs english score
 
 First I wanted to determine how well a student's math ability can be used to predict his verbal ability. As seen in the first graph, the correlation is extremely good (0.9702879), so states that do well in one area tends to do well in the other.
 
-Then I compared teacher's salary with student's SAT math scores. Intuitively we expect higher salary to reflect a higher qualification, so students receive a better education and thus scores better. However according to this dataset, the higher teacher's average salary, the worse students perform on their exams (cor = -0.4039747). 
+Then I compared teacher's salary with student's SAT math scores. Intuitively we expect higher salary to reflect a higher qualification, so students receive a better education and thus scores better. However according to this dataset, the higher teacher's average salary, the worse students perform on their exams (cor = -0.4039747). This is quite unexpected and we may want to find out why this is.
 
 Finally, the bottom graph shows that while a state's population without high school education could vary considerably (from 13 to 35), that does not have any effect on student's verbal SAT score (cor = -0.04700939). This is another rather strange phenomenon since we would expect a more educated state to treat SAT more seriously and hence be more successful at it. 
 
-The state scoring 510 on sat Math but 480 on sat Verbal is the point deviating the most away from the regression line in plot 1. Even so, 30 points is not a huge discrepency. If we ignore the part that some states have as much as 35 percent of the population without a high school diploma, there is little unusal values. 
+The state scoring 510 on sat Math but 480 on sat Verbal is the point deviating the most away from the regression line in plot 1. Even so, 30 points is not a huge discrepency. Other two plots have such a high variance that we could say all are atypical values, or all are normal. As such, I'd say the only atypical trend is the part where some states have as much as 35 percent of its population without a high school diploma.
 
 #problem 5
 Perform a least-squares regression of fertility on contraception from Robery et al.'s data in developing countries. Plot the data and the least-squares line. Does the line adequately summarize the relationship between these variables? Examine and interpret the values of $A, B, S_E,$, and $r$ or $r^2$. 
@@ -123,10 +167,13 @@ total_fertility_rate = mydata[[2]]
 contraception = mydata[[3]]
 
 plot(contraception, total_fertility_rate, main="Total fertility rate vs Contraception", 
-     xlab="Percept of contraceptors", ylab="Avg number of children", pch=19)
+     xlab="Percent of contraceptors", ylab="Avg number of children", pch=19)
 
-line_1 = lm(total_fertility_rate ~ contraception)
-abline(line_1)
+lm(total_fertility_rate ~ contraception)
+abline(lm(total_fertility_rate ~ contraception))
 ```
 
-Here the X axis describes the percentage of women in childbearing age who use contraceptions, and the Y axis describes the average number of childrens a women gives birth to. Clearly, the higher number of children the lower the contraception usage, with correlation between the two variable being -0.9203109. 
+Here the X axis describes the percentage of women in childbearing age who use contraceptions, and the Y axis describes the average number of childrens a women gives birth to. Unlike the previous problem, this is of no surprise because we know that contraception are, in principle, supposed to prevent successful fertilization, and hence a higher contraception rate should lead to a lower number of children. 
+
+The line of best fit has Y intercept 6.87509 with slope -0.058416. This means that we predict every unit increase in contraception will cause $\approx 0.05$ decrease in the number of children. The correlation between the two variables is -0.9203109, meaning that the negative slope given by the line of best fit is a pretty good predictor.
+

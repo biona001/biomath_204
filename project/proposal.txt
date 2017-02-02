@@ -1,0 +1,8 @@
+Problem motivation:CPC Corporation is a Taiwanese oil company owned by the government and distributes ~70% of Taiwan's gas. This company publically announces any adjustments to gas prices one week in advance, but does not always adjust gas prices weekly. Does knowing this information allow one to devise a strategy that, in the long run, save money compared to those who refuels whenever they run out? If so, how much? Data description:From CPC's website, I obtained a table listing the dates of price adjustments, and prices after adjustment for 12 different kinds of purchasable gas since 1999. I plan on focusing on gas prices after 2006 for the 3 major automobile gases (92, 95, 98), whose prices change weekly or biweekly. Prior to 2006 prices were not often adjusted.Secondly, I wish to conduct a survey on facebook asking for the following:1.	How many hours per week do you drive?2.	How often do you refuel?
+3.	At what percent of empty tank do you start thinking about refueling?3.	Do you pay attention to gas price fluctuation, both in time or location?4.	If yes to (3), do you adjust your refueling time/location based on prices?Method:1. Post on UCLA Facebook group to get data, mainly “how often do one refuel”.
+2. Import CPC_data into R studio
+3. Write code simulating the refueling process. 
+	a. Everyday people will lose ??% of their fuel
+	b. A group (control) refuels whenever they drop below ??% 
+	c. Another group starts thinking about refueling at around ??%, but may decide to choose to wait depending on whether next week’s gas is cheaper (assuming their tank could last that long).
+	d. Vary parameters in (c) to find optimal strategy.

@@ -1,0 +1,46 @@
+---
+title: "simulate_gas"
+author: "Benjamin Chu"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Code description
+
+The point of the project is to simulate the process of refueling under gas price fluctuations. We wish to determine whether there exists some kind of strategy in terms of refueling such that one can save money in the long run, and if so, approximately how much we save.
+
+We will have a control group and a test group, both of which start at 100% fuel. Everyday they will lose x% of fuel, where $x \sim N(\mu, \sigma^2)$ with $\mu, \sigma$ to be determined by a survey for the final project. The control group will refuel whenever they drop below $y$% of gas. For the test group, they will start thinking about refueling when they reached $z$% of empty tank, and based on their knowledge of the current and following weeks' gas price, decide when to refuel.
+
+```{r}
+library(pdftools)
+mydata <- pdf_text("CPC_data.pdf")
+
+
+
+
+lose_fuel <- function(mean, sd) {
+  lost = rnorm(1, mean, sd)
+  if (lost < 0) {
+    lost = 0
+  }
+  return(lost)
+}
+
+control <- function(start_date, )
+```
+
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

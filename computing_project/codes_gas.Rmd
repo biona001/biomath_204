@@ -17,21 +17,69 @@ The point of the project is to simulate the process of refueling under gas price
 We will have a control group and a test group, both of which start at 100% fuel. Everyday they will lose x% of fuel, where $x \sim N(\mu, \sigma^2)$ with $\mu, \sigma$ to be determined by a survey for the final project. The control group will refuel whenever they drop below $y$% of gas. For the test group, they will start thinking about refueling when they reached $z$% of empty tank, and based on their knowledge of the current and following weeks' gas price, decide when to refuel.
 
 ```{r}
-library(pdftools)
-mydata <- pdf_text("CPC_data.pdf")
+library(readxl) # parsing excel
+library(lubridate) # dates/months/years addition made easy
+mydata <- read_excel("CPC_data.xlsx")
 
+X_VALUE = 10
+Y_VALUE = 30
+Z_VALUE = 40
 
+assign_fuel_type <- function(fuel_type) { # identity fuel type (92/95/98)
+  dummy_var = 0
+  if (fuel_type == 92) {dummy_var = 2}
+  else if (fuel_type == 95) {dummy_var = 3}
+  else if (fuel_type == 98) {dummy_var = 4}
+  else {
+    print("please enter either 92, 95, or 98")
+    return()
+  }
+  return(dummy_var)
+}
 
-
-lose_fuel <- function(mean, sd) {
-  lost = rnorm(1, mean, sd)
+lose_fuel <- function() { # everyday lose fuel ~ normal
+  SD = 5
+  
+  lost = rnorm(1, X_VALUE, SD)
   if (lost < 0) {
     lost = 0
   }
   return(lost)
 }
 
-control <- function(start_date, )
+control <- function(fuel_type, table) {
+  # fuel_type = 92, 95, 98
+  # current_tank = rational number between 0 and 100
+  
+  total_expense = 0
+  
+  which_column = assign_fuel_type(fuel_type)
+  my_price_list = table[[which_column]]
+  my_date_list = table[[1]]
+  
+  current_date = ymd(head(my_date_list, 1)) # consider popping this
+  last_day = ymd(tail(my_date_list, 1))
+  current_price = head(my_price_list, 1) # consider popping this
+  current_fuel = 100
+  
+  while(current_date != last_day) {
+    current_fuel = current_fuel - lose_fuel() #lost some fuel
+    current_date = current_date + ddays(1) # 1 day passed.... 
+    
+    if(current_date == #price change date) {
+       #change price
+    }
+    
+    if(current_fuel < Y_VALUE) {
+      #refuel()
+    }
+    
+  }
+}
+
+lose_fuel()
+
+
 ```
 
 

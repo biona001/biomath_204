@@ -12,14 +12,18 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Code description
 
-The point of the project is to simulate the process of refueling under gas price fluctuations. We wish to determine whether there exists some kind of strategy in terms of refueling such that one can save money in the long run, and if so, approximately how much we save.
+For the computing project I chose to implement part of the code needed for my final project. For my final project, I need to simulate the process of refueling under gas price fluctuations. Ultimately I am going to compare the total expenditure of control group vs test group, where they employ different refueling strategies. 
 
-We will have a control group and a test group, both of which start at 100% fuel. Everyday they will lose x% of fuel, where $x \sim N(\mu, \sigma^2)$ with $\mu, \sigma$ to be determined by a survey for the final project. The control group will refuel whenever they drop below $y$% of gas. For the test group, they will start thinking about refueling when they reached $z$% of empty tank, and based on their knowledge of the current and following weeks' gas price, decide when to refuel.
+Here I implemented the control group. Everyday they will lose x% of fuel, where $x \sim N(\mu, \sigma^2)$ and they will blindly refuel whenever they drop below $y$% of gas. Currently all numbers (mean, SD, tank size...etc. are all arbitrarily chosen). I have not made the graphs pretty yet, but I figured it is sufficient to illustrate my point. Below are descriptions of major functions:
+
+$\texttt{control:}$ Simulates the refueling process of the control group. Keeps track of expense in a list. 
+
+$\texttt{lose-fuel:}$ Everyday people will lose $x\%$ of fuels, where $x \sim N(\mu, \sigma^2)$.
 
 ```{r}
 library(readxl) # parsing excel
 library(lubridate) # dates/months/years addition made easy
-mydata <- read_excel("CPC_data.xlsx")
+mydata <- read_excel("CPC_data_short.xlsx")
 
 X_VALUE = 10
 Y_VALUE = 30
@@ -39,8 +43,8 @@ assign_fuel_type <- function(fuel_type) { # identity fuel type (92/95/98)
 
 lose_fuel <- function() { # everyday lose fuel ~ normal
   SD = 5
+  lost = rnorm(1, X_VALUE, SD) #generate x ~ N(mean, SD^2)
   
-  lost = rnorm(1, X_VALUE, SD)
   if (lost < 0) {
     lost = 0
   }
@@ -48,47 +52,53 @@ lose_fuel <- function() { # everyday lose fuel ~ normal
 }
 
 control <- function(fuel_type, table) {
-  # fuel_type = 92, 95, 98
-  # current_tank = rational number between 0 and 100
-  
-  total_expense = 0
-  
+  # fuel_type = 92, 95, or 98
+
   which_column = assign_fuel_type(fuel_type)
   my_price_list = table[[which_column]]
   my_date_list = table[[1]]
   
-  current_date = ymd(head(my_date_list, 1)) # consider popping this
-  last_day = ymd(tail(my_date_list, 1))
-  current_price = head(my_price_list, 1) # consider popping this
+  current_date = ymd(my_date_list[1]) 
+  current_price = my_price_list[1]
+  my_price_list <- my_price_list[-1] #delete first element 
+  my_date_list <- my_date_list[-1] #delete first element 
+  last_day = ymd(my_date_list[length(my_date_list)])
+  
+  total_expense = 0 # keep track of total money spent
+  expense_list <- list(total_expense) # keeps track of marginal expense
   current_fuel = 100
   
-  while(current_date != last_day) {
-    current_fuel = current_fuel - lose_fuel() #lost some fuel
-    current_date = current_date + ddays(1) # 1 day passed.... 
-    
-    if(current_date == #price change date) {
-       #change price
+  while (current_date != last_day) {
+    if(current_fuel < Y_VALUE) { # refuel when necessary
+      total_expense = total_expense + 57.0 * current_price #57 liters ~ 15 gallons ~ approx gas tank size, where 1USD = 30NT.
+      expense_list <- append(expense_list, total_expense / 30.0)
+      current_fuel = 100
     }
     
-    if(current_fuel < Y_VALUE) {
-      #refuel()
-    }
+    current_fuel = current_fuel - lose_fuel()
+    current_date = current_date + ddays(1)
     
+    #check if today needs price adjustments. Remember to watch out for NA.
+    if (current_date == ymd(my_date_list[1])) { 
+      my_date_list <- my_date_list[-1]
+      if (!is.na(my_price_list[1])) {
+        current_price = my_price_list[1]
+      }
+      my_price_list <- my_price_list[-1] 
+    }
   }
+  return(expense_list)
 }
 
-lose_fuel()
 
+test_1 = control(92, mydata)
+number_1 = length(test_1)
+count_1 = 1:number_1
+plot(count_1, test_1, col="grey", las = 2, main = "Simulating gas expenditure from 2012~2013. Fuel = 92", xlab="Refuels", ylab="Cumulative cost (USD)", pch=19)
+
+test_2 = control(98, mydata)
+number_2 = length(test_2)
+count_2 = 1:number_2
+plot(count_2, test_2, col="green", las = 2, main = "Simulating gas expenditure from 2012~2013. Fuel = 98", xlab="Refuels", ylab="Cumulative cost (USD)", pch=19)
 
 ```
-
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

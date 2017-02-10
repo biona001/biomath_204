@@ -1,6 +1,7 @@
 ---
-title: "simulate_gas"
+title: "Computing Porject: Gas Price Simulation"
 author: "Benjamin Chu"
+date: "2/10/2017"
 output:
   pdf_document: default
   html_document: default
@@ -10,15 +11,22 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Code description
+## Problem motivation
 
-For the computing project I chose to implement part of the code needed for my final project. For my final project, I need to simulate the process of refueling under gas price fluctuations. Ultimately I am going to compare the total expenditure of control group vs test group, where they employ different refueling strategies. 
+In Taiwan, the government owns 70% of the gas distributed nationally. They publically announces any price changes in gas price at least 1 week in advance, but does not always adjust prices. As such, gas stations are often flooded with cars even when the following week's gas price is about to increase by $\epsilon$ amount. I wish to investigate whether waiting hours in line to save a couple of cents is necessary. In the long run, how much money can be saved if we deviate away from refueling whenever we need to?
 
-Here I implemented the control group. Everyday they will lose x% of fuel, where $x \sim N(\mu, \sigma^2)$ and they will blindly refuel whenever they drop below $y$% of gas. Currently all numbers (mean, SD, tank size...etc. are all arbitrarily chosen). I have not made the graphs pretty yet, but I figured it is sufficient to illustrate my point. Below are descriptions of major functions:
+## Computing project description
+My final project is going to be a combination of simulation, surveying, and data analysis on gas price. For the computing project I chose to implement (a major) part of the code needed for my final project simulation. My strategy for simulating the refueling process can be accomplished by modeling the total expense of two groups of people. A $\textbf{control group}$ will refuel whenever their tank drop below a certain number. A $\textbf{test group}$ will start considering refueling whenever their tank drop below a different number, and depending on whether they have information on the following week's gas price, choose a strategy that will (1) not run out of fuel at any point, and (2) minimize their spending on gas. Ultimately I can run these simulations 100 times each and compare their average spending as a function of time. Hopefully that will give me useful information to answer my master question.
 
-$\texttt{control:}$ Simulates the refueling process of the control group. Keeps track of expense in a list. 
+## Code and Data Description
 
-$\texttt{lose-fuel:}$ Everyday people will lose $x\%$ of fuels, where $x \sim N(\mu, \sigma^2)$.
+Here I implemented the control group. Everyday they will lose $\texttt{X-VALUE}$ of fuel, where currently $\texttt{X-VALUE}$ is taken from a normal distribution with mean 10 and SD 5. They will blindly refuel whenever they drop below $\texttt{Y-VALUE} = 20\%$ of gas. All of these numbers (mean, SD, tank size, x-value...etc.) have not been obtained through survey and are all chosen based on my intuition. Then I run this simulation on two datasets CPC_data_short.xlsx and CPC_data.xlsx, representing Taiwan's gas price fluctuations of 2009 and from 1999~2017, respectively. Below are descriptions of major functions:
+
+$\texttt{control:}$ 
+Simulates the refueling process of the control group. The input is a data set of interest and the fuel type (currently limited to 92, 95, or 98). The output is expense_list, which is a list element constructed the following way: everytime we refuel, we will increase the total_expense by some amount, and the new total expense will be added to the expense_list. This way, we could keep track of the total money we spent on gas as a function of time.
+
+$\texttt{lose-fuel:}$ 
+Everyday people will lose $x\%$ of fuels, where $x \sim N(\mu, \sigma^2)$. If $x < 0,$ we set it equal to zero (people can't gain fuel other than refueling). 
 
 ```{r}
 library(readxl) # parsing excel
@@ -43,7 +51,7 @@ assign_fuel_type <- function(fuel_type) { # identity fuel type (92/95/98)
 
 lose_fuel <- function() { # everyday lose fuel ~ normal
   SD = 5
-  lost = rnorm(1, X_VALUE, SD) #generate x ~ N(mean, SD^2)
+  lost = rnorm(1, X_VALUE, SD) #generate x ~ N(mean, SD)
   
   if (lost < 0) {
     lost = 0
@@ -94,11 +102,23 @@ control <- function(fuel_type, table) {
 test_1 = control(92, mydata)
 number_1 = length(test_1)
 count_1 = 1:number_1
-plot(count_1, test_1, col="grey", las = 2, main = "Simulating gas expenditure from 2012~2013. Fuel = 92", xlab="Refuels", ylab="Cumulative cost (USD)", pch=19)
+plot(count_1, test_1, col="green", las = 2, xlim = c(0, 50), ylim = c(0, 3000), main = "Gas expenditure of 2009. Fuel = 92(g) 95(r) 98(b)", xlab="Refuels", ylab="Cumulative cost (USD)", pch=19)
 
-test_2 = control(98, mydata)
+test_2 = control(95, mydata)
 number_2 = length(test_2)
 count_2 = 1:number_2
-plot(count_2, test_2, col="green", las = 2, main = "Simulating gas expenditure from 2012~2013. Fuel = 98", xlab="Refuels", ylab="Cumulative cost (USD)", pch=19)
+par(new=TRUE) #plots the second graph on top of first graph
+plot(count_2, test_2, col="red", las = 2, xlim = c(0, 50), ylim = c(0, 3000), xlab="Refuels", ylab="Cumulative cost (USD)", pch=19)
+
+test_3 = control(98, mydata)
+number_3 = length(test_3)
+count_3 = 1:number_3
+par(new=TRUE) #plots the second graph on top of first graph
+plot(count_3, test_3, col="blue", las = 2, xlim = c(0, 50), ylim = c(0, 3000), xlab="Refuels", ylab="Cumulative cost (USD)", pch=19)
 
 ```
+
+## Conclusion
+I ran my code on the gas price of 2009 because the gas price increased by about 50% by the end of the year. Since the control group have no strategy in the refueling process, we expect their gas expenditure to drift along with the market price. Here our plot was mildly able to capture that upward concavity. Also, more expensive gases incrued a higher cost, around 200 USD more if one chose 98 as opposed to 92. Every run could have a different number of points, because a different number of refueling could have taken place. In particular this implies that it is not always the case that choosing the cheapest gas will end up paying the least, because by chance alone you might have to refuel more often and end up paying more. 
+
+I think the idea that fuels are lost according to a normal distribution is neither realistic (because one cannot lose a negative amount of fuel) nor does it exhibit any "dramatic effect" potentially sensitive to the market price. For the final project, perhaps I should look into other distributions. 

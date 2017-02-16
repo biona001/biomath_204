@@ -1,5 +1,7 @@
 ---
-title: "hw2"
+title: "Biomath 204 hw2"
+author: "Benjamin Chu"
+date: 2/17/2017
 output:
   pdf_document: default
   html_document: default
@@ -11,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Problem 1
 Define $f(x) = x^2 - a, f'(x) = 2x$. According to newton's method, we have
-$$x_{n+1} = x_n - \frac{f(x)}{f'(x)} = x_n - \frac{x_n^2 - a}{2x_n} = \frac{1}{2}(x_n - \frac{a}{x_n})$$
+$$x_{n+1} = x_n - \frac{f(x)}{f'(x)} = x_n - \frac{x_n^2 - a}{2x_n} = \frac{1}{2}(x_n - \frac{a}{x_n}).$$
 
 ```{r}
 newton <- function(f, fp, x) {
@@ -61,20 +63,9 @@ We observe that the $K$'s eventually stabalize at around $0.042$. In other words
 library(MASS)
 x = seq(0, 9, 1)
 y = c(98, 135, 162, 178, 221, 232, 283, 300, 374, 395)
-m <- lm(y ~ x)
-bc <- boxcox(y ~ x)
-(trans <- bc$x[which.max(bc$y)])
-```
-
-
-
-
-
-```{r}
-library(MASS)
-x = seq(0, 9, 1)
-y = c(98, 135, 162, 178, 221, 232, 283, 300, 374, 395)
-plot(x, y, ylim=c(0,500), ylab="Units Sold", main="Original")
+regl <- lm(y ~ x)
+plot(x, y, ylim=c(0,700), ylab="Units Sold")
+abline(regl)
 
 g <- function(y) {
   n = length(y)
@@ -88,13 +79,12 @@ g <- function(y) {
 z <- function(y, lambda, g) {
   output <- list()
   for (i in y) {
-    # z_i = (i^lambda - 1) / lambda / g^(lambda-1)
-    z_i = (i^lambda - 1) / lambda
+    z_i = (i^lambda - 1) / lambda / g^(lambda-1)
+    # z_i = (i^lambda - 1) / lambda
     output <- append(output, z_i)
   }
   return(output)
 }
-
 
 num = g(y)
 three = z(y, 0.3, num)
@@ -103,14 +93,58 @@ five = z(y, 0.5, num)
 six = z(y, 0.6, num)
 seven = z(y, 0.7, num)
 
-plot(x, three, col="red", ylim=c(0,100), ylab="Units Sold", main="Red=0.3, Organge=0.4, Yellow=0.5, Green=0.6, Purple=0.7")
 par(new=TRUE)
-plot(x, four, col="orange", ylim=c(0,100), ylab="Units Sold")
+plot(x, three, col="red", ylim=c(0,700), ylab="Units Sold (in thousands)", main="Black = orig, Red=0.3, Org=0.4, Ylw=0.5, Green=0.6, Ppl=0.7")
 par(new=TRUE)
-plot(x, five, col="yellow2", ylim=c(0,100), ylab="Units Sold")
+plot(x, four, col="orange", ylim=c(0,700), ylab="Units Sold")
 par(new=TRUE)
-plot(x, six, col="green", ylim=c(0,100), ylab="Units Sold")
+plot(x, five, col="yellow2", ylim=c(0,700), ylab="Units Sold")
 par(new=TRUE)
-plot(x, seven, col="blue", ylim=c(0,100), ylab="Units Sold")
+plot(x, six, col="green", ylim=c(0,700), ylab="Units Sold")
+par(new=TRUE)
+plot(x, seven, col="blue", ylim=c(0,700), ylab="Units Sold")
+
+# anova(lm(unlist(three) ~ x))
+# anova(lm(unlist(four) ~ x))
+# anova(lm(unlist(five) ~ x))
+# anova(lm(unlist(six) ~ x))
+# anova(lm(unlist(seven) ~ x))
 ```
-It appears that the function, both before (black) and after box-cox transfer(red ~ blue) is quite linear. Here yellow is the 
+It appears that the function, both before (black) and after box-cox transfer(red ~ blue) is quite linear. Here yellow line is the box cox transform with $\lambda = 0.5$. The SSE for each case can be computed by calling anova(lm(y ~ x)) as long as we converted the list element into a vector by unlisting them first. The SSE for the original = 1799, and the transformed ones have 
+$$\text{SSE:  } \lambda_{0.3} = 1100, \lambda_{0.4} = 968, \lambda_{0.5} = 916, \lambda_{0.6} = 942, \lambda_{0.7} = 1044$$ 
+In particular this suggests that $\lambda = 0.5$ is the transform that minimizes the SSE.
+
+```{r}
+x = seq(0, 9, 1)
+y = c(98, 135, 162, 178, 221, 232, 283, 300, 374, 395)
+y_sqrt = c(98^.5, 135^.5, 162^.5, 178^.5, 221^.5, 232^.5, 283^.5, 300^.5, 374^.5, 395^.5)
+
+regl <- lm(y_sqrt ~ x)
+plot(x, y_sqrt, main="Y' = sqrt(Y) plot")
+abline(regl)
+
+res <- residuals(lm(y_sqrt ~ x))
+plot(y_sqrt, res, main="residual plot")
+qqnorm(res, main="normal probability plot of residuals")
+
+```
+Here the regression line appears to be a reasonably good fit to the transformed data, since it's linear. 
+It appears that just plotting the residuals against the fitted values ($\sqrt{Y}$) does have have any indication that it's normally distributed. However graphing it in the normal probability plot, we see a rather straight line, indicating that it is almost normal.
+
+## Problem 3
+
+```{r}
+mydata = read.table("ch03pr18.dat.txt")
+x = mydata[1]
+y = mydata[2]
+regl <- lm(unlist(y) ~ unlist(x))
+plot(unlist(x), unlist(y), xlab="Response errors", ylab="months since last hunting")
+abline(regl)
+
+#residuals(lm(unlist(mydata[2]) ~ unlist(mydata[1])))
+```
+
+Here the correlation between response errors and the months since last hinting is very linear, with correlation of -0.997. If we were to rescale this plot, I propose to transform the Y-axis. This is because the plot has slightly more data points towards the right side of the x-axis (i.e. negatively skewed). If we had instead scaled the x-axis, we would need to push data points on the right side to the left, rendering them even closer to each other. Thus the graph would appear as if many data points are on the right side with little on the left, which is presumably undesirable.
+
+## Problem 4
+

@@ -148,3 +148,45 @@ Here the correlation between response errors and the months since last hinting i
 
 ## Problem 4
 
+This problem (taken from version 1) asks to make four datasets more linear. To do so, I transformed one or both variables. 
+
+```{r}
+sahlins = read.table("sahlins.txt")
+sahlins$trans_X <- (sahlins$consumers)^(1/2)
+sahlins$trans_Y <- (sahlins$acres * 4)^(1/2)
+plot(unlist(sahlins[1]), unlist(sahlins[2]), main="Sahlins original")
+plot(unlist(sahlins[3]), unlist(sahlins[4]), main="Sahlins transformed x and y")
+```
+
+Here I transformed both x and y according to $X = \sqrt{X}, Y + Y^{1/3}$. The rational behind doing this is that the original data has very dispersed $X$ values, so I want to compress them towards the left. The $Y$ values are just too messed up for small $Y$ values. I couldn't figure out how to make this plot look linear.
+
+```{r}
+robey <- read.table("Robey.txt")
+robey$x_trans <- (robey$tfr)^1.5
+plot(robey$tfr, robey$contraceptors, main="robey original", xlab="total fertility rate", ylab="% contraception usage")
+plot(robey$x_trans, robey$contraceptors, main="robey transformed x axis", xlab="total fertility rate", ylab="% contraception usage")
+```
+
+For the Robey.txt data, the original data had long x-tail on the left, suggesting that I need to scale x-values up (total fertility rate). So I raised x-values to their 1.5 power, and the result looks pretty decent.
+
+```{r}
+angell = read.table("angell.txt")
+angell$tran_moral = (angell$moralIntegration)^(1/2)
+angell$tran_het = log10(angell$heterogeneity)
+
+plot(angell$moralIntegration, angell$heterogeneity, main="angell Original", xlab="moral integration", ylab="heterogeneity")
+plot(angell$tran_moral, angell$tran_het,  main="angell tranformed x and y", xlab="moral integration", ylab="heterogeneity")
+```
+
+For this one it looks like we have very big variance at small x, but otherwise okay fit. So initially I tried to do box-cox. However the result did not appear to look better (or different) at all. Thus I decided to compress y values by taking the log. Then the graph appeared skewed towards the right, so I square rooted the x values, obtaining the resulting graph. 
+
+```{r}
+orn = read.table("ornstein.txt")
+orn$tran_asset <- log10(orn$assets)
+orn$tran_inter <- log10(orn$interlocks+2)
+
+plot(orn$assets, orn$interlocks, main="ornstein original", xlab="asset", ylab="interlocks")
+plot(orn$tran_asset, orn$tran_inter, main="ornstein transformed", xlab="asset", ylab="interlocks")
+```
+
+Here the original data was most crumbled near the origin, so I log-scaled both the x and y axis. Since the interlock column can potentially take values of 0, I added 2 to each value to prevent a negative infinity.

@@ -1,0 +1,25 @@
+---
+title: "Identify and Correct for Non-Response Bias"
+author: "Benjamin Chu"
+date: "3/7/2017"
+output:
+  pdf_document: default
+  html_document: default
+---
+#Introduction
+
+#Method
+
+#Result
+```{r}
+library(readxl)
+survey <- read_excel("survey_test.xlsx")
+plot(survey$age, survey$`con refuel %`, xlab="Age", ylab="When one starts considers refueling")
+x <- lm(survey$`con refuel %` ~ survey$age)
+abline(x)
+```
+
+
+#Discussion
+
+#References

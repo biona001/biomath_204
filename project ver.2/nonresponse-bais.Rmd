@@ -9,14 +9,26 @@ output:
 #Introduction
 
 #Method
+released a google form 
+Got 62 real responses, and the distributin are as follows
+```{r}
+library(readxl)
+survey <- read_excel("survey_result.xlsx")
+count(survey$year)
+freqcy <- c(19,10,18,8,7)
+lbls <- c("freshmen", "sophomores", "juniors", "seniors", "5th year or higher")
+pct <- round(freqcy/sum(freqcy)*100)
+lbls <- paste(lbls, pct)
+lbls <- paste(lbls,"%",sep="")
+pie(freq, labels=lbls, col=rainbow(length(lbls)))
+```
+
 
 #Result
 ```{r}
 library(readxl)
-survey <- read_excel("survey_test.xlsx")
-plot(survey$age, survey$`con refuel %`, xlab="Age", ylab="When one starts considers refueling")
-x <- lm(survey$`con refuel %` ~ survey$age)
-abline(x)
+survey <- read_excel("survey_result.xlsx")
+plot(survey$drivingDays, survey$refuelPerc)
 ```
 
 

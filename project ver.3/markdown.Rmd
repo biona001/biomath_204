@@ -6,19 +6,23 @@ output:
   html_document: default
   pdf_document: default
 ---
+## Abstract
+In the field of surveying, there are many causes for one to mistakenly collect a bad dataset and obtain fruitless or even misleading results. This project uses the [1991 Race and Politics Survey](http://sda.berkeley.edu/D3/Natlrace/Doc/nrac.htm) to illustrate a common type of unintentional bias called non-response bias. In particular, we identify non-response bias by analyzing the difference between initial and late respondents. Then using the "second phase surveying" data as described in methods section, we show how to adjust for non-response bias in two different ways. Finally, we compare the adjusted data set with the non-adjusted data and discuss their difference. This project is carried out in an effort to supplement our studies in biomath 204 at UCLA, since we covered numerous techniques in data analysis but had little discussion in surveying techniques. 
+
 ## Introduction
 In biomath 204, we focused on data analysis techniques to draw useful information from given datasets. Another important aspect of data analysis is surveying. If we are unaware of bad surveying techniques and potential biases, we could work with a terrible dataset and get nothing (junk in junk out) at best. At worst, we could give wrong recommendations even though our analysis is completely correct. Among the pool of surveying techniques and biases, I focused on how to identify and adjust for $\textbf{non-response bias}$ in the context of a $\textbf{random sampling}$ survey, both of which are standard and compelling issues today.
 
-* Random sampling - a subset of individuals (sample) chosen from a larget set (population).
-* Non-response bias - Error due to the subset of the $\textbf{chosen sample}$ not responding to the survey. 
-
+##### Definitions and examples
+* Random sampling - a subset of individuals (sample) chosen from a larger set (population) to be surveyed.
+* Non-response bias - Error due to a subset of the chosen sample not responding to the survey. This becomes a problem when a significant population have reasons to avoid responding to a survey. 
+    * $\textbf{when present, no amount of data can negate its effect}.$
+    * e.g. In the 1936 U.S. Presidential Election, 2.3 million surveys predict Alf Landon would win with 370/521 electoral votes. He got 8. 
+    
 ## Method and Data Description
-From [Survey Documentation and Analysis (SDA) archive](http://sda.berkeley.edu/archive.htm), I obtained the [1991 Race and Politics Survey](http://sda.berkeley.edu/D3/Natlrace/Doc/nrac.htm) results. This is a telephone survey which collected a total of 2223 respondents with an impressive 65.3% response rate. This dataset is particularly suited for non-response bias analysis, because participants were sent additional survey questionnaires through mail after they completed the phone interview, in which the researchers received another 1198 "second round" response. Because the first round of telephone survey already collected certain information about the respondents, we can view this second round of sampling as a separate survey, and develop weights to adjust for non-response bias using demographic data collected from the first round. 
-
-Interestingly, I did not find any published paper on this dataset, which is very strange in my opinion. 
+From [Survey Documentation and Analysis (SDA) archive](http://sda.berkeley.edu/archive.htm), I obtained the [1991 Race and Politics Survey](http://sda.berkeley.edu/D3/Natlrace/Doc/nrac.htm) results. This is a telephone survey containing 178 questions, which collected a total of 2223 respondents with an impressive 65.3% response rate. This dataset is particularly suited for non-response bias analysis, because participants were sent additional survey questionnaires through mail after they completed the phone interview, in which the researchers received another 1198 "second round" responses. Because the first round of telephone survey already collected certain background information about the respondents, we can view this second round of sampling as a separate survey, and develop weights to adjust for non-response bias using demographic data such as age and race collected from the first round. 
 
 ## Identifying Non-response Bias through Callback
-In the selected sample, people who did not participate in the survey (e.g. refusal, not at home...etc) may be randomly asked again to participate some time later. Those who agreed to take the survey only after several attempts are called late respondents. In survey methodology, this process is called $\textbf{callback}$ and it is an excellent way to identify non-response bias is to compare initial and late respondents. We must assume:
+A common technique to identify non-response bias is by using callbacks. In the selected sample, people who did not participate in the survey (e.g. refusal, not at home...etc) may be randomly asked again to participate some time later. Those who agreed to take the survey only after several attempts are called late respondents. In survey methodology, this process is called $\textbf{callback}$ and it is an excellent way to identify non-response bias is to compare initial and late respondents. We must assume:
 
 * These late respondents are similar to the non-respondents
 * The difference between early and late respondents is captured in the metric we used to measure them. 
@@ -57,7 +61,10 @@ p = p + facet_grid(facets=. ~ rcnt) # Side by side bar chart
 p
 ```
 
-As we can see from the bar graph above, the distribution of opinions among initial and late respondents is not exactly the same. In particular, the proportion of people who refused to answer this question is significantly higher in the late respondents than initial respondents. Is this statistically significant? Let us test out another example.
+
+As we can see from the bar graph above, the proportion of people who refused to answer this question is significantly higher in the late respondents than initial respondents. With 1840 initial respondents, 19 refused to answer this question, while 20 refused to answer this among the 62 late respondents. Clearly there is non-response bias, but is one test statistically significant? Let us check out another example.
+
+
 
 ```{r cache=FALSE, message=FALSE, warning=FALSE}
 test <- read.table(file="data2.txt", sep=",", header=T)
@@ -83,8 +90,17 @@ p = p + facet_grid(facets=. ~ rcnt) # Side by side bar chart
 p
 ```
 
+Here the graph for 0 refusal and 1 refusal look almost identical, while for the 2+ refusals a proportion of the Somewhat agree went to the Strongly agree. However with the responses both being affirmative, we conclude that there is no non-response bias. 
+
+So out of 2 questions, one definitely contained non-response bias, while the other probably did not. What does this tell us about the overall credibility of the survey? If we want to be more certain, we can analyze more questions as a total of 178 were asked. On the other hand, even if we looked at all of them, this method is a rather qualitative notion for exposing non-response biases. In the next section, we show how to actually adjust for them using weights.
+
+## Adjusting for Non-response 
+Depending on what data we are analyzing, a potentially easy way to adjust for non-response bias is to use weights. In order to apply this technique, we must already have some basic information of the samples (e.g. age) $\textbf{before}$ we send out our questionnaires. After we conclude our studies and obtain a list of respondents and non-respondents, we then compare the difference between them by measuring how the information we had initially differ in respondents and non-respondents. Based on this measurable difference, we decide who's response is "more important" in some way, and scale each data point accordingly. 
+
+Here we assume that the non-response is missing completely at random, meaning that missing response are independent of observable and non-observable parameters.  
+
 ## Discussion
-hihihihihi
+Interestingly, I did not find any published analysis on this dataset, so I could not compare my analysis with any professional work. 
 
 ## References
 

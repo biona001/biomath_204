@@ -3,8 +3,8 @@ title: "Identify and Adjust for Non-response Bias"
 author: "benjamin chu"
 date: "3/8/2017"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 ## Abstract
 In the field of surveying, there are many causes for one to mistakenly collect a bad dataset and obtain fruitless or even misleading results. This project uses the [1991 Race and Politics Survey](http://sda.berkeley.edu/D3/Natlrace/Doc/nrac.htm) to illustrate a common type of unintentional bias called non-response bias. In particular, we identify non-response bias by analyzing the difference between initial and late respondents. Then using the "second phase surveying" data as described in methods section, we show how to adjust for non-response bias in two different ways. Finally, we compare the adjusted data set with the non-adjusted data and discuss their difference. This project is carried out in an effort to supplement our studies in biomath 204 at UCLA, since we covered numerous techniques in data analysis but had little discussion in surveying techniques. 
@@ -29,7 +29,7 @@ A common technique to identify non-response bias is by using callbacks. In the s
 
 Among the 2223 respondents, we can determine how many people refused to participate in the survey at least 2 times:
 ```{r cache=FALSE, message=FALSE}
-survey <- read.table(file="data2.txt", sep=",", header=T)
+survey <- read.table(file="data3.txt", sep=",", header=T)
 sum(survey$rcnt==0)
 sum(survey$rcnt>=2)
 ```
@@ -38,7 +38,7 @@ Thus there were 1840 people who agreed to take the survey when they were first r
 ```{r cache=FALSE, message=FALSE, warning=FALSE}
 library(ggplot2)
 library(sqldf)
-test <- read.table(file="data2.txt", sep=",", header=T)
+test <- read.table(file="data3.txt", sep=",", header=T)
 test$con2 <- factor(test$con2) # converts to a categorical variable
 test$rcnt <- factor(test$rcnt)
 
@@ -62,12 +62,12 @@ p
 ```
 
 
-As we can see from the bar graph above, the proportion of people who refused to answer this question is significantly higher in the late respondents than initial respondents. With 1840 initial respondents, 19 refused to answer this question, while 20 refused to answer this among the 62 late respondents. Clearly there is non-response bias, but is one test statistically significant? Let us check out another example.
+As we can see from the bar graph above, the proportion of people who refused to answer this question is significantly higher in the late respondents than initial respondents. With 1840 initial respondents, 19 refused to answer this question, while 20 refused to answer this among the 62 late respondents. Clearly there is non-response bias, but is this statistically significant? Let us check out another example.
 
-
+chi squared test here?
 
 ```{r cache=FALSE, message=FALSE, warning=FALSE}
-test <- read.table(file="data2.txt", sep=",", header=T)
+test <- read.table(file="data3.txt", sep=",", header=T)
 test$ef5 <- factor(test$ef5) # converts to a categorical variable
 test$rcnt <- factor(test$rcnt)
 
@@ -94,10 +94,72 @@ Here the graph for 0 refusal and 1 refusal look almost identical, while for the 
 
 So out of 2 questions, one definitely contained non-response bias, while the other probably did not. What does this tell us about the overall credibility of the survey? If we want to be more certain, we can analyze more questions as a total of 178 were asked. On the other hand, even if we looked at all of them, this method is a rather qualitative notion for exposing non-response biases. In the next section, we show how to actually adjust for them using weights.
 
-## Adjusting for Non-response 
-Depending on what data we are analyzing, a potentially easy way to adjust for non-response bias is to use weights. In order to apply this technique, we must already have some basic information of the samples (e.g. age) $\textbf{before}$ we send out our questionnaires. After we conclude our studies and obtain a list of respondents and non-respondents, we then compare the difference between them by measuring how the information we had initially differ in respondents and non-respondents. Based on this measurable difference, we decide who's response is "more important" in some way, and scale each data point accordingly. 
+## Adjusting for Unit Non-response with Weights 
+Suppose we wish to determine what percentage of population agrees with the statement "Most people who don't succeed are lazy". One thing we could do is to simply take the average: divide total number of responses that agrees with the statement by the total number of responses. Let us visualize the descriptive statistics:
 
-Here we assume that the non-response is missing completely at random, meaning that missing response are independent of observable and non-observable parameters.  
+```{r}
+plot(survey$age, survey$m4a, xlab="Age", main="Most people who don't succeed are lazy")
+```
+
+
+However, we may suspect that perhaps younger people are generally more optimistic about their future. These motivated youngsters, so confident in their ability, overwhelmingly voted yes to the above question. If our survey respondents somehow contained more young respondents due to random chance, we would overestimate the percentage of people who agrees with this statement. How do we adjust for this bias? Let us begin with definitions. 
+
+##### Overview
+In order to apply the weighting technique, we must already have some basic information of the samples (e.g. age) $\textit{before}$ we send out our questionnaires. After we conclude our studies and obtain a list of respondents and non-respondents, we then compare the difference between them by categorizing respondents and non-respondents into disjoint cells. Based on the number of respondents in each cell, we scale each data point by their frequency. Intuitively, we decide who's response is "more important" in some way, and make their vote count more.
+
+##### Definitions
+* $\beta_i = 1$ if response is strongly agree or somewhat agree.  
+* $S_i$ represents the number of respondents in each cell.
+* $y_i = \beta_i S_i$ be the variable of interest.
+* $\pi_i$ be the probability to be drawn (design weight).
+* $p_i$ be the response probability .
+* $w_i = (\pi_ip_i)^{-1}$ the non-response-adjusted weight for observation $i$. 
+
+##### Pre-weighting
+First let's see people's response to the statement "Most people who don't succeed are lazy". (1 = Strongly agree, 2 = somewhat agree, 3 = somewhat disagree, 4 = Strongly disagree, 9 = missing data)
+```{r}
+table(survey$m4a)
+```
+So here 
+$$\overline{Y} = \sum y_i / \sum S_i = \frac{51+341}{51+341+563+229+14} = 32.7\%$$
+Thus among all the respondents, we estimate that only 32.7% of the population agrees with the statement. Quite a pessimistic society. 
+
+##### Post weighting by age
+First we divide the respondents into disjoint cells by age (cell size = 10 years).
+```{r results="hide"}
+#split(survey, cut(survey$age, c(18, 28, 38, 48, 58, 68, 78, 88, 150), include.lowest=TRUE))
+msurvey <- survey[!is.na(survey$m4a),]
+#split(msurvey, cut(msurvey$age, c(18, 28, 38, 48, 58, 68, 78, 88, 150), include.lowest=TRUE))
+msurvey[msurvey$age>=18 & msurvey$age<=28 & msurvey$m4a<=2,]
+msurvey[msurvey$age>=29 & msurvey$age<=38 & msurvey$m4a<=2,]
+msurvey[msurvey$age>=39 & msurvey$age<=48 & msurvey$m4a<=2,]
+msurvey[msurvey$age>=49 & msurvey$age<=58 & msurvey$m4a<=2,]
+msurvey[msurvey$age>=59 & msurvey$age<=68 & msurvey$m4a<=2,]
+msurvey[msurvey$age>=69 & msurvey$age<=78 & msurvey$m4a<=2,]
+msurvey[msurvey$age>=79 & msurvey$age<=88 & msurvey$m4a<=2,]
+msurvey[msurvey$age>=89 & msurvey$age<=150 & msurvey$m4a<=2,]
+```
+So we know that among the 2223 samples and 1198 respondents, their age distribution arranged in 10 years starting from 18 is summarized in the following table:
+```{r}
+sam_to_resp <- c(444, 606, 466, 259, 221, 159, 52, 16, 
+                 213, 320, 256, 148, 136, 95, 28, 2,
+                 66, 103, 76, 54, 36, 45, 10, 2) 
+colname <- c("18~28", "29~38", "39~48", "49~58", "59~68", "69~78", "79~88", "89+")
+rowname <- c("Total Sample", "Respondents", "Respondents who agreed")
+age_dist <- matrix(sam_to_resp, nrow=3, ncol=8, byrow=TRUE, dimnames=list(rowname, colname))
+age_dist
+```
+Now to compute the adjusted percentage of people who agrees ($\hat{\overline{Y}}$):
+
+\begin{equation}
+\begin{split}
+\hat{\overline{Y}} = \frac{\sum w_iy_i}{S_i} = \frac{66\frac{444}{213}+103\frac{606}{320}+76\frac{466}{256}+54\frac{259}{148}+36\frac{221}{136}+45\frac{159}{95}+10\frac{52}{28}+2\frac{16}{2}}{444+606+466+259+221+159+52+16}
+&= 33.0\%
+\end{split}
+\end{equation}
+
+
+
 
 ## Discussion
 Interestingly, I did not find any published analysis on this dataset, so I could not compare my analysis with any professional work. 

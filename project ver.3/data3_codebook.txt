@@ -1,0 +1,292 @@
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                      CODEBOOK
+
+
+                       1991 National Race and Politics Survey
+                                          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      1991 National Race and Politics Survey                            Page i
+
+
+                                      CONTENTS
+
+
+      item                                                                page
+
+      CASEID             Case ID number                                      1
+      age                Age of respondent                                   1
+      con2               Rules are to follow, not change                     1
+      rcnt               Total number of refusals                            2
+      ef5                Narrow gap: rich and poor                           2
+      m4a                Most people who don't succeed are lazy              3
+      m4i                Americans too concerned with competition            3
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   March 10, 2017
+
+
+
+      1991 National Race and Politics Survey                            Page 1
+
+
+      CASEID             Case ID number
+
+           Data type: numeric
+           Record/columns: 1/1-5
+
+      ________________________________________________________________________
+
+      age                Age of respondent
+
+
+           First I'm going to ask you a few questions just to make sure we're
+           reaching a genuine cross-section of the country.
+
+           How old were you on your last birthday?
+
+           VALUE  LABEL
+              18  Exact age
+              97  97 or older
+              98  DK
+              99  RF/MD
+
+           Data type: numeric
+           Minimum code defined as valid: 18
+           Missing-data codes: 99,98
+           Record/columns: 1/7-8
+
+      ________________________________________________________________________
+
+      con2               Rules are to follow, not change
+
+           (How about) Rules are there for people to follow, not to try to change?
+           (Do you ...
+
+           VALUE  LABEL
+               1  Agree strongly
+               3  Agree somewhat
+               5  Disagree somewhat
+               7  Disagree strongly
+               8  DK
+               9  RF/MD
+
+           Data type: numeric
+           Minimum code defined as valid: 1
+           Missing-data codes: 9,8
+           Record/column: 1/10
+
+
+
+
+
+
+
+
+                                   March 10, 2017
+
+
+
+      1991 National Race and Politics Survey                            Page 2
+
+
+      rcnt               Total number of refusals
+
+           Number of preliminary contacts with the HH resulting in what
+           interviewers described as either direct or indirect refusals by
+           HH members, guests, servants, etc., to participate in the survey.
+
+           VALUE  LABEL
+               0  No refusals
+               1  Refusal
+               2  Refusals
+               3  Refusals
+
+           Data type: numeric
+           Record/column: 1/12
+
+      ________________________________________________________________________
+
+      ef5                Narrow gap: rich and poor
+
+           How about "narrowing the gap in income between the rich and the poor?"
+           Are you strongly in favor, somewhat in favor, somewhat opposed, or
+           strongly opposed to these programs?
+
+           VALUE  LABEL
+               1  Strongly in favor
+               3  Somewhat in favor
+               5  Somewhat opposed
+               7  Strongly opposed
+               8  DK
+               9  RF/MD
+
+           Data type: numeric
+           Minimum code defined as valid: 1
+           Missing-data codes: 9,8
+           Record/column: 1/14
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   March 10, 2017
+
+
+
+      1991 National Race and Politics Survey                            Page 3
+
+
+      m4a                Most people who don't succeed are lazy
+
+           Most people who don't succeed in life are just plain lazy
+
+           VALUE  LABEL
+               1  Agree strongly
+               2  Agree somewhat
+               3  Disagree somewhat
+               4  Disagree strongly
+               9  MD
+
+           Data type: numeric
+           Minimum code defined as valid: 1
+           Missing-data codes: 9,9
+           Record/column: 1/16
+
+      ________________________________________________________________________
+
+      m4i                Americans too concerned with competition
+
+           American people are too concerned about the value of competition
+
+           VALUE  LABEL
+               1  Agree strongly
+               2  Agree somewhat
+               3  Disagree somewhat
+               4  Disagree strongly
+               9  MD
+
+           Data type: numeric
+           Minimum code defined as valid: 1
+           Missing-data codes: 9,9
+           Record/column: 1/18
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   March 10, 2017

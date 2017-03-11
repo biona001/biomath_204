@@ -1,0 +1,53 @@
+ /*  SPSS Data Definition File
+ /*  Created by ddltox on Mar 10, 2017  (Fri 11:39 PM PST)
+ /*  DDL source file: "/var/www/sda/tmpdir/ddl4511015334174631996.txt".
+
+TITLE "1991 National Race and Politics Survey".
+COMMENT  DDL indicates that dataset record length (reclen) is 18 columns.
+
+DATA LIST fixed records=1
+  FILE="x"  /* Replace 'x' with full path name of your input data file.
+ /1           CASEID 1-5                 age 7-8                 con2 10
+                 rcnt 12                  ef5 14                  m4a 16
+                  m4i 18
+   .
+
+VARIABLE LABELS
+   CASEID    'Case ID number' /
+   age       'Age of respondent' /
+   con2      'Rules are to follow, not change' /
+   rcnt      'Total number of refusals' /
+   ef5       'Narrow gap: rich and poor' /
+   m4a       'Most people who don''t succeed are lazy' /
+   m4i       'Americans too concerned with competition' /
+   .
+
+VALUE LABELS
+   age       18 'R''s age' 97 '97+ yrs' 98 'DK' 99 'RF/ MD' /
+   con2      1 'agr strg' 3 'agr some' 5 'dis some' 7 'dis strg' 8 'DK' 
+             9 'RF/ MD' /
+   rcnt      0 'No refusals' 1 'Refusal' 2 'Refusals' 3 'Refusals' /
+   ef5       1 'strg fav' 3 'some fav' 5 'some opp' 7 'strg opp' 8 'DK' 
+             9 'RF/ MD' /
+   m4a       1 'agr strg' 2 'agr some' 3 'dis some' 4 'dis strg' 9 'MD' /
+   m4i       1 'agr strg' 2 'agr some' 3 'dis some' 4 'dis strg' 9 'MD' /
+   .
+
+COMMENT  md, min and max specifications were translated into the
+COMMENT following "MISSING VALUES" commands and "IF" statements:.
+
+MISSING VALUES  age (99,98).
+IF (age LT 18) age = $SYSMIS.
+MISSING VALUES  con2 (9,8).
+IF (con2 LT 1) con2 = $SYSMIS.
+MISSING VALUES  ef5 (9,8).
+IF (ef5 LT 1) ef5 = $SYSMIS.
+MISSING VALUES  m4a (9,9).
+IF (m4a LT 1) m4a = $SYSMIS.
+MISSING VALUES  m4i (9,9).
+IF (m4i LT 1) m4i = $SYSMIS.
+
+SAVE OUTFILE=y  /* Replace 'y' with name to give your system file
+   /MAP
+   /COMPRESSED  /* Delete this line if you want an uncompressed file
+   .

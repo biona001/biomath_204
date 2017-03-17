@@ -16,19 +16,17 @@ In the field of surveying, there are many causes for one to mistakenly collect a
 ## Introduction
 In biomath 204, we focused on data analysis techniques to draw useful information from given datasets. Another important aspect of data analysis is surveying. If we are unaware of bad surveying techniques and potential biases, we could work with a terrible dataset and get nothing (junk in junk out) at best. At worst, we could give wrong recommendations even though our analysis is completely correct. Among the pool of surveying techniques and biases, I focused on how to identify and adjust for $\textbf{non-response bias}$ in the context of a $\textbf{random sampling}$ survey, both of which are standard and compelling issues today.
 
-#### Basic definitions
-
 ##### Random Sampling
 A subset of individuals (sample) chosen from a larger set (population) to be surveyed. This is generally the strategy chosen unless it is not feasible. 
 
 ##### Non-response Bias (unit)
 Error due to a subset of the chosen sample not responding to the survey. This becomes a problem when a significant population have reasons to avoid responding to a survey. 
 
-* When present,$\textbf{no amount of data can negate its effect}.$
-* e.g. In the 1936 U.S. Presidential Election, 2.3 million surveys predict Alf Landon would win with 370/521 electoral votes. He got 8. 
+* When present,$\textbf{ no amount of data can negate its effect}.$
+* e.g. In the 1936 U.S. Presidential Election, 10 million surveys were sent out and 2.3 million were returned, predicting Alf Landon would win with 370/521 electoral votes. He got 8. 
     
 ## Method and Data Description
-From [Survey Documentation and Analysis (SDA) archive](http://sda.berkeley.edu/archive.htm), I obtained the [1991 Race and Politics Survey](http://sda.berkeley.edu/D3/Natlrace/Doc/nrac.htm) results. This is a telephone survey containing 178 questions, which collected a total of 2223 respondents with an impressive 65.3% response rate. This dataset is particularly suited for non-response bias analysis for two reasons. First, they perform up to 4 callbacks, which enabled me to perform an initial vs late respondent analysis. Secondly, participants were sent additional survey questionnaires through mail after they completed the phone interview, in which the researchers received another 1198 "second round" responses. Because the first round of telephone survey already collected certain background information about the respondents, we can view this second round of sampling as a separate survey, and develop weights to adjust for non-response bias using demographic data such as age and race collected from the first round. 
+From [Survey Documentation and Analysis (SDA) archive](http://sda.berkeley.edu/archive.htm), I obtained the [1991 Race and Politics Survey](http://sda.berkeley.edu/D3/Natlrace/Doc/nrac.htm) results. This is a telephone survey containing 178 questions, which collected a total of 2223 respondents with an impressive 65.3% response rate. This dataset is particularly suited for non-response bias analysis for two reasons. First, they perform up to 4 callbacks, which enabled me to employ a standard technique to identify non-response bias known as callback. Secondly, participants were sent additional survey questionnaires through mail after they completed the phone interview, in which the researchers received another 1198 "second round" responses. Because the first round of telephone survey already collected certain background information about the respondents, we can view this second round of sampling as a separate survey, and develop weights to adjust for non-response bias using demographic data such as age and race collected from the first round. 
 
 ## Identifying Non-response Bias through Callback
 A common technique to identify non-response bias is by using callbacks. In the selected sample, people who did not participate in the survey (e.g. refusal, not at home...etc) may be randomly asked again to participate some time later. Those who agreed to take the survey only after several attempts are called late respondents. In survey methodology, this process is called $\textbf{callback}$ and it is an excellent way to quickly identify non-response bias. We must assume:
@@ -43,9 +41,9 @@ sum(survey$rcnt==0)
 sum(survey$rcnt>=2)
 ```
 
-Thus there were 1840 people who agreed to take the survey when they were first reached, and 62 people who eventually took the survey despite refusing to do so at least 2 times. Let us compare whether these early and late respondents held different opinion to the question "Rules are to follow, not change":
+Thus there were 1840 people who agreed to take the survey when they were first reached, and 62 people who eventually took the survey despite refusing to do so at least 2 times. Let us compare whether these early and late respondents held different opinion to the question "Rules are to follow, not change" (code hidden):
 
-```{r cache=FALSE, message=FALSE, warning=FALSE}
+```{r cache=FALSE, message=FALSE, warning=FALSE, echo=FALSE}
 library(ggplot2)
 library(sqldf)
 test <- read.table(file="data3.txt", sep=",", header=T)
@@ -71,9 +69,9 @@ p = p + facet_grid(facets=. ~ rcnt) # Side by side bar chart
 p
 ```
 
-As we can see from the bar graph above, the proportion of people who refused to answer this question is significantly higher in the late respondents than initial respondents. Specifically, with 1840 initial respondents, 19 refused to answer this question, while 20 refused to answer this among the 62 late respondents. Clearly we have non-response bias, but is this statistically significant? Let us check out another example. 
+As we can see from the bar graph above, the proportion of people who refused to answer this question is significantly higher in the late respondents than initial respondents. Specifically, with 1840 initial respondents, 19 refused to answer this question, while 20 refused to answer this among the 62 late respondents. Clearly we have non-response bias, but do we immediately toss this dataset? Let us check out another example (code hidden again). 
 
-```{r cache=FALSE, message=FALSE, warning=FALSE}
+```{r cache=FALSE, message=FALSE, warning=FALSE, echo=FALSE}
 test2 <- read.table(file="data3.txt", sep=",", header=T)
 test2$ef5 <- factor(test2$ef5) # converts to a categorical variable
 test2$rcnt <- factor(test2$rcnt)
@@ -99,14 +97,12 @@ p
 
 Here the graph for 0 refusal and 1 refusal look almost identical, while for the 2+ refusals a proportion of the somewhat agree went to the strongly agree. However, given that the proportion of responses agreeing to the statement as a whole is almost completely the same, I think it is safe to conclude that there is no non-response bias for this question. 
 
-So out of 2 questions, one definitely contained non-response bias, while the other probably did not. What does this tell us about the overall credibility of the survey? If we want to be more certain, we can easily look at more questions, as a total of 178 were asked. We may also reasonbaly suspect that perhaps the "nonrespondents" can only be identified in certain areas. 
-
-On the other hand, even if we looked at more questions, this method is a rather qualitative notion for exposing non-response biases. Suppose we have a dataset we really want to use, even if there are some non-response bias. Can we adjust the data cleverly so that our analysis is meaningful? In the next section, we show how to do so by weighting.
+So out of 2 questions, one definitely contained non-response bias, while the other probably did not. What does this tell us about the overall credibility of the survey? If we want to be more certain, we can easily look at more questions, as a total of 178 were asked. On the other hand, this method is a rather qualitative notion for exposing non-response biases. Suppose we have a dataset we really want to use, even if there are some non-response bias. Can we adjust the data cleverly so that our analysis is meaningful? In the next section, we show how to do so by weighting.
 
 ## Adjusting for Unit Non-response with Weights 
 Suppose we wish to determine what percentage of population agrees with the statement "Most people who don't succeed are lazy". Given a set of responses, one thing we could do is to simply take the average: divide total number of responses that agrees with the statement by the total number of responses. Let us visualize the descriptive statistics (1~4 = Strongly agree ~ Strongly disagree, 9 = refuse to answer).
 
-```{r message=FALSE, warning=FALSE}
+```{r message=FALSE, warning=FALSE, echo=FALSE}
 library(ggplot2)
 msurvey <- survey[!is.na(survey$m4a),]
 df <- data.frame(x=msurvey$age, y=msurvey$m4a)
@@ -116,14 +112,15 @@ plt = plt + ggtitle("Visualizing: Most people who don't succeed are lazy") + yla
 plt
 ```
 
-However, the above data visualization indicated that people between the age of 25 and 50 mostly voted for "3, slightly disagree" to the above statement, as the density for that row appears to be the darkest. If our survey respondents somehow contained a large number of people within this age bracket, we would underestimate the percentage of people who agrees with this statement. If we want to understand the overall population's opinion on this problem, our analysis by averaging would skew towards the younger generation. How do we adjust for this bias? Let us begin with definitions. 
+However, the above data visualization indicated that people around the age of 35 mostly voted for "3, somewhat disagree" to the above statement, as the density for that row appears to be the darkest. If our survey respondents somehow contained a larger than usual pool of people around 35 years old, we might underestimate the percentage of people who agrees with this statement. How do we adjust for this bias?  
 
 ##### Overview
-Intuitively, we decide who's response is "more important" in some way, and make their votes count more. In order to apply this technique, however, we must satisfy a very difficult criteria before applying it. That is, we must already have some basic information of the samples (e.g. age, income, weight...etc) $\textit{before}$ we send out our questionnaires. We use this information to categorize respondents and non-respondents into disjoint cells $\textit{after}$ we conclude our studies. Based on the number of respondents in each cell, we scale each data point by their frequency. This way, each cell relative to each other is equally important, but individuals in a small cell is relatively more important than individuals in a large cell. 
+Intuitively, we decide who's response is "more important" in some way, and make their votes count more. In order to apply this technique, however, we must satisfy a very difficult criteria before applying it. That is, we must already have some basic information of the samples (e.g. age, income, weight...etc) $\textit{before}$ we send out our questionnaires. We use this information to categorize respondents and non-respondents into disjoint cells $\textit{after}$ we conclude our studies. Each cell relative to each other is equally important, so that individuals in a small cell is relatively more important than individuals in a large cell. 
 
 Note in our case, we can apply this technique because our first round of telephone survey already asked for certain information about our respondents. In general, this information is hard to obtain.
 
 ##### Definitions
+
 * $\beta_i = 1$ if response is strongly agree or somewhat agree.  
 * $S_i$ represents the number of respondents in each cell.
 * $y_i = \beta_i S_i$ be the variable of interest.
@@ -132,9 +129,11 @@ Note in our case, we can apply this technique because our first round of telepho
 * $w_i = (\pi_ip_i)^{-1}$ the non-response-adjusted weight for observation $i$. 
 
 ##### Pre-weighting 
-First let us determine our sample's response to the statement "Most people who don't succeed are lazy". (1 = Strongly agree, 2 = somewhat agree, 3 = somewhat disagree, 4 = Strongly disagree, 9 = missing data). 
-```{r}
-table(survey$m4a)
+First let us determine our sample's response to the statement "Most people who don't succeed are lazy".
+```{r, echo=FALSE}
+df <- table(survey$m4a)
+names(df) <- c("Strg Agr", "Smwat Agr", "Smwat Disag", "Strg Disag", "No Ans")
+df
 ```
 
 We can naively take the average by dividing total number of positive response by the total number of response:
@@ -142,8 +141,8 @@ $$\overline{Y} = \sum y_i / \sum S_i = \frac{51+341}{51+341+563+229+14} = 32.7\%
 Thus among all the respondents, only 32.7% of the population agrees with the statement. Quite a pessimistic society. 
 
 ##### Post weighting by age
-From the density scatter plot, we know that age affects people's opinion. So first we divide the respondents into disjoint cells by age (cell size = 10 years).
-```{r results="hide"}
+From the density scatter plot, we know that age affects people's opinion. So first we divide the respondents into disjoint cells by age.
+```{r results="hide", echo=FALSE}
 #split(survey, cut(survey$age, c(18, 28, 38, 48, 58, 68, 78, 88, 150), include.lowest=TRUE))
 msurvey <- survey[!is.na(survey$m4a),]
 #split(msurvey, cut(msurvey$age, c(18, 28, 38, 48, 58, 68, 78, 88, 150), include.lowest=TRUE))
@@ -156,8 +155,10 @@ msurvey[msurvey$age>=69 & msurvey$age<=78 & msurvey$m4a<=2,]
 msurvey[msurvey$age>=79 & msurvey$age<=88 & msurvey$m4a<=2,]
 msurvey[msurvey$age>=89 & msurvey$age<=150 & msurvey$m4a<=2,]
 ```
-So we know that among the 2223 samples and 1198 respondents, their age distribution arranged in 10 years starting from 18 is summarized in the following table:
-```{r}
+
+Among the 2223 samples and 1198 respondents, their age distribution arranged in 10 years starting from 18 is summarized in the following table (cell size = 10 years):
+
+```{r echo=FALSE}
 sam_to_resp <- c(444, 606, 466, 259, 221, 159, 52, 16, 
                  213, 320, 256, 148, 136, 95, 28, 2,
                  66, 103, 76, 54, 36, 45, 10, 2) 
@@ -181,7 +182,7 @@ Thus the difference is quite small. We estimate that approximately $0.3\%$ more 
 ## Discussion 
 Surveying is an important source of data to undertsand general human behavior. As participants are not controlled as in a science experiment, being able to account for human biases is crucial to drawing meaningful inferences from this kind of data. In this project, I showed how to quickly identify non-response bias through callbacks, which is a tedious but standard technique used in almost every good survey. Then I showed how to adjust for non-response bias through weighting, which is very intuitive idea but requires information about participants before we conduct our survey. Hopefully these two techniques will be a useful starting point when one is faced with a real survey challenge some time in the future.
 
-Unfortunately, I did not find any published analysis on this dataset, so I could not compare my analysis with any professional work. This is quite unexpected since the data collected is very complete. 
+Unfortunately, I did not find any published analysis on this dataset, so I could not compare my results with any professional work. I was quite surprized that this is the case since the data collected is very complete. 
 
 ## References
 
